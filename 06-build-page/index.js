@@ -6,13 +6,8 @@ const assetsSrc = path.join(__dirname, 'assets');
 const assetsDst = path.join(projectPath, 'assets');
 const stylesPath = path.join(__dirname, 'styles');
 
-fs.mkdir(projectPath, {recursive: true}, (err) => {
-    if (err) throw err;
-});
-
-fs.mkdir(assetsDst, {recursive: true}, (err) => {
-    if (err) throw err;
-});
+makeFolder(projectPath);
+makeFolder(assetsDst);
 
 fs.readdir(assetsSrc, (err, list) => {
   if (err) throw err;
@@ -20,11 +15,9 @@ fs.readdir(assetsSrc, (err, list) => {
   list.forEach(item => {
     const folderSrcPath = path.join(assetsSrc, item);
     const folderDestPath = path.join(assetsDst, item);
-    
-    fs.mkdir(folderDestPath, {recursive: true}, (err) => {
-        if (err) throw err;
-    });
-    fs.readdir(folderSrcPath, {recursive: true}, (err, list) => {
+    makeFolder(folderDestPath);
+
+    fs.readdir(folderSrcPath, (err, list) => {
       if (err) throw err;
 
       list.forEach(item => {
@@ -50,6 +43,7 @@ fs.writeFile(styleFile, '', (err) => {
         const fileName = path.join(stylesPath, item);
         fs.readFile(fileName, (err, data) => {
           if (err) throw err;
+
           fs.appendFile(styleFile, data, err => {
             if (err) throw err;
           });
@@ -73,6 +67,7 @@ fs.readFile(templateFile, {encoding: 'utf-8'}, (err, string) => {
       const templateName = '{{' + nameFile + '}}';
       fs.readFile(path.join(componetsPath, item), {encoding: 'utf-8'}, (err, subString) => {
         if (err) throw err;
+
         string = string.replace(templateName, subString);        
         fs.writeFile(path.join(projectPath, 'index.html'), string, err => {
           if (err) throw err;
@@ -81,3 +76,9 @@ fs.readFile(templateFile, {encoding: 'utf-8'}, (err, string) => {
     });
   });  
 });
+
+function makeFolder (path) {
+  fs.mkdir(path, {recursive: true}, (err) => {
+    if (err) throw err;
+  });
+}
